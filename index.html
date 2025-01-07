@@ -72,69 +72,78 @@
             min-height: 100%;
         }
 
+        .controls {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 3px;
+            width: 90%;
+            backdrop-filter: blur(3px);
+        }
+
+        .slider-controls {
+            display: grid;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider-group label {
+            color: white;
+            font-size: 10px;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(0, 123, 255, 0.3);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
         button {
-            padding: 2px 6px;
+            padding: 4px 8px;
             border: none;
             background-color: rgba(0, 123, 255, 0.3);
             color: white;
             border-radius: 2px;
             cursor: pointer;
             font-size: 10px;
-            backdrop-filter: blur(2px);
-        }
-
-        button:hover {
-            background-color: rgba(0, 86, 179, 0.5);
-        }
-
-        .controls {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 3px;
-            background-color: rgba(255,255,255,0.2);
-            padding: 4px;
-            border-radius: 3px;
-            width: 80%;
-            backdrop-filter: blur(3px);
-        }
-
-        .controls button {
-            min-width: 18px;
-            height: 18px;
-            padding: 1px 3px;
-        }
-
-        .pan-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-            grid-column: span 3;
-        }
-
-        .pan-controls button {
-            padding: 1px;
-            min-width: 16px;
-            height: 16px;
-            font-size: 8px;
-        }
-
-        .download-button {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 6px 12px;
-            font-size: 12px;
-            background-color: rgba(0, 123, 255, 0.4);
         }
 
         .file-input-container {
             position: relative;
             display: inline-block;
+            margin-top: 5px;
         }
 
         .file-input {
@@ -148,21 +157,21 @@
             z-index: 1;
         }
 
-        /* Mobile responsive styles */
-        @media screen and (max-width: 820px) {
-            body {
-                padding: 5px;
-            }
+        .download-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 12px;
+            font-size: 12px;
+            background-color: rgba(0, 123, 255, 0.4);
+        }
 
+        @media screen and (max-width: 820px) {
             .a4-canvas {
                 width: 100%;
                 height: auto;
                 min-height: 100vh;
-            }
-
-            .heading {
-                font-size: 24px;
-                margin: 15px 0;
             }
 
             .image-grid {
@@ -182,52 +191,6 @@
                 width: 100%;
                 height: 100%;
             }
-
-            .controls {
-                width: 90%;
-                bottom: 5px;
-            }
-
-            /* Make buttons bigger for touch */
-            button {
-                padding: 4px 8px;
-                font-size: 12px;
-            }
-
-            .controls button {
-                min-width: 24px;
-                height: 24px;
-            }
-
-            .pan-controls button {
-                min-width: 22px;
-                height: 22px;
-                font-size: 10px;
-            }
-
-            .download-button {
-                padding: 8px 16px;
-                font-size: 14px;
-                bottom: 15px;
-            }
-        }
-
-        /* Small mobile devices */
-        @media screen and (max-width: 400px) {
-            .image-grid {
-                padding: 10px;
-                gap: 15px;
-            }
-
-            .heading {
-                font-size: 20px;
-                margin: 10px 0;
-            }
-
-            .controls {
-                gap: 2px;
-                padding: 3px;
-            }
         }
     </style>
 </head>
@@ -242,26 +205,31 @@
                     </div>
                 </div>
                 <div class="controls">
-                    <button onclick="zoomIn(1)">+</button>
-                    <button onclick="zoomOut(1)">-</button>
+                    <div class="slider-controls">
+                        <div class="slider-group">
+                            <label>Zoom</label>
+                            <input type="range" class="zoom-slider" min="10" max="300" value="100" onchange="handleZoom(1, this.value)" oninput="handleZoom(1, this.value)">
+                        </div>
+                        <div class="slider-group">
+                            <label>X Position</label>
+                            <input type="range" class="pan-x-slider" min="-100" max="100" value="0" onchange="handlePanX(1, this.value)" oninput="handlePanX(1, this.value)">
+                        </div>
+                        <div class="slider-group">
+                            <label>Y Position</label>
+                            <input type="range" class="pan-y-slider" min="-100" max="100" value="0" onchange="handlePanY(1, this.value)" oninput="handlePanY(1, this.value)">
+                        </div>
+                    </div>
                     <label class="file-input-container">
                         <button>Replace</button>
                         <input type="file" class="file-input" onchange="handleImageUpload(event, 1)" accept="image/*">
                     </label>
-                    <div class="pan-controls">
-                        <button onclick="pan(1, 0, -10)">↑</button>
-                        <button onclick="pan(1, 0, 10)">↓</button>
-                        <button onclick="pan(1, -10, 0)">←</button>
-                        <button onclick="pan(1, 10, 0)">→</button>
-                    </div>
                 </div>
             </div>
         </div>
-        <button class="download-button" onclick="downloadImage()">Print</button>
+        <button class="download-button" onclick="printImage()">Print</button>
     </div>
 
     <script>
-        // Previous JavaScript remains the same
         const imageStates = {};
         const containers = 6;
 
@@ -270,22 +238,19 @@
             const container = document.querySelector('#container1').cloneNode(true);
             container.id = `container${i}`;
             
-            // Update file input handler
+            // Update input handlers for sliders
+            const zoomSlider = container.querySelector('.zoom-slider');
+            const panXSlider = container.querySelector('.pan-x-slider');
+            const panYSlider = container.querySelector('.pan-y-slider');
             const fileInput = container.querySelector('.file-input');
+
+            zoomSlider.onchange = (e) => handleZoom(i, e.target.value);
+            zoomSlider.oninput = (e) => handleZoom(i, e.target.value);
+            panXSlider.onchange = (e) => handlePanX(i, e.target.value);
+            panXSlider.oninput = (e) => handlePanX(i, e.target.value);
+            panYSlider.onchange = (e) => handlePanY(i, e.target.value);
+            panYSlider.oninput = (e) => handlePanY(i, e.target.value);
             fileInput.onchange = (e) => handleImageUpload(e, i);
-            
-            // Update zoom controls
-            const zoomInButton = container.querySelector('.controls button:first-child');
-            const zoomOutButton = container.querySelector('.controls button:nth-child(2)');
-            zoomInButton.onclick = () => zoomIn(i);
-            zoomOutButton.onclick = () => zoomOut(i);
-            
-            // Update pan controls
-            const panButtons = container.querySelectorAll('.pan-controls button');
-            panButtons[0].onclick = () => pan(i, 0, -10);
-            panButtons[1].onclick = () => pan(i, 0, 10);
-            panButtons[2].onclick = () => pan(i, -10, 0);
-            panButtons[3].onclick = () => pan(i, 10, 0);
             
             document.querySelector('.image-grid').appendChild(container);
         }
@@ -307,28 +272,27 @@
             `;
         }
 
-        function pan(containerId, deltaX, deltaY) {
+        function handleZoom(containerId, value) {
             const state = imageStates[containerId];
-            state.translateX += deltaX;
-            state.translateY += deltaY;
+            state.scale = value / 100;
             updateImagePosition(
                 document.querySelector(`#container${containerId} .preview-image`),
                 state
             );
         }
 
-        function zoomIn(containerId) {
+        function handlePanX(containerId, value) {
             const state = imageStates[containerId];
-            state.scale = Math.min(3, state.scale + 0.05);
+            state.translateX = parseInt(value);
             updateImagePosition(
                 document.querySelector(`#container${containerId} .preview-image`),
                 state
             );
         }
 
-        function zoomOut(containerId) {
+        function handlePanY(containerId, value) {
             const state = imageStates[containerId];
-            state.scale = Math.max(0.1, state.scale - 0.05);
+            state.translateY = parseInt(value);
             updateImagePosition(
                 document.querySelector(`#container${containerId} .preview-image`),
                 state
@@ -343,19 +307,25 @@
                     const img = document.querySelector(`#container${containerId} .preview-image`);
                     img.src = e.target.result;
                     
-                    // Reset transformations
+                    // Reset transformations and sliders
                     imageStates[containerId] = {
                         scale: 1,
                         translateX: 0,
                         translateY: 0
                     };
+                    
+                    const container = document.querySelector(`#container${containerId}`);
+                    container.querySelector('.zoom-slider').value = 100;
+                    container.querySelector('.pan-x-slider').value = 0;
+                    container.querySelector('.pan-y-slider').value = 0;
+                    
                     updateImagePosition(img, imageStates[containerId]);
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function downloadImage() {
+        function printImage() {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
@@ -372,7 +342,6 @@
                 const img = container.querySelector('.preview-image');
                 const state = imageStates[i];
                 
-                // Skip placeholder images
                 if (img.src.includes('placeholder')) {
                     continue;
                 }
@@ -383,36 +352,46 @@
                     tempCanvas.width = 283.5;
                     tempCanvas.height = 283.5;
                     
+                    // Create circular clip path
                     tempCtx.beginPath();
                     tempCtx.arc(141.75, 141.75, 141.75, 0, Math.PI * 2);
                     tempCtx.clip();
                     
+                    // Calculate grid position
                     const row = Math.floor((i - 1) / 2);
                     const col = (i - 1) % 2;
                     const x = 40 + col * (283.5 + 40);
                     const y = 40 + row * (283.5 + 40);
                     
+                    // Calculate scaled dimensions
+                    const scaledWidth = img.naturalWidth * state.scale;
+                    const scaledHeight = img.naturalHeight * state.scale;
+                    
+                    // Calculate centered position within the circle
+                    const centerX = 141.75 - (scaledWidth / 2) + state.translateX;
+                    const centerY = 141.75 - (scaledHeight / 2) + state.translateY;
+                    
+                    // Draw the image with correct scaling and positioning
                     tempCtx.drawImage(
                         img,
-                        -state.translateX,
-                        -state.translateY,
-                        img.width * state.scale,
-                        img.height * state.scale
+                        centerX,
+                        centerY,
+                        scaledWidth,
+                        scaledHeight
                     );
                     
+                    // Draw the circular image onto main canvas
                     ctx.drawImage(tempCanvas, x, y);
                     resolve();
                 }));
             }
 
-            // If no images were added to promises, add at least one promise
             if (promises.length === 0) {
                 alert('Please add at least one image before printing.');
                 return;
             }
             
             Promise.all(promises).then(() => {
-                // Create a new window with the canvas image
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Print</title>');
                 printWindow.document.write('<style>');
@@ -432,12 +411,10 @@
                 `);
                 printWindow.document.write('</style></head><body>');
                 
-                // Add the image to the new window
                 const img = new Image();
                 img.src = canvas.toDataURL('image/png');
                 printWindow.document.body.appendChild(img);
                 
-                // Wait for image to load before printing
                 img.onload = function() {
                     printWindow.document.close();
                     printWindow.focus();
