@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Collage Creator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .a4-canvas {
+            width: 793.7px;
+            height: 1122.5px;
+            background-color: white;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .heading {
+            font-family: Arial, sans-serif;
+            color: rgba(0, 123, 255, 0.8);
+            font-size: 32px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            padding: 40px;
+            justify-items: center;
+        }
+
+        .image-container {
+            width: 283.5px;
+            height: 283.5px;
+            position: relative;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .circular-mask {
+            width: 283.5px;
+            height: 283.5px;
+            position: absolute;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .image-holder {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-image {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        button {
+            padding: 2px 6px;
+            border: none;
+            background-color: rgba(0, 123, 255, 0.3);
+            color: white;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 10px;
+            backdrop-filter: blur(2px);
+        }
+
+        button:hover {
+            background-color: rgba(0, 86, 179, 0.5);
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+            background-color: rgba(255,255,255,0.2);
+            padding: 4px;
+            border-radius: 3px;
+            width: 80%;
+            backdrop-filter: blur(3px);
+        }
+
+        .controls button {
+            min-width: 18px;
+            height: 18px;
+            padding: 1px 3px;
+        }
+
+        .pan-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            grid-column: span 3;
+        }
+
+        .pan-controls button {
+            padding: 1px;
+            min-width: 16px;
+            height: 16px;
+            font-size: 8px;
+        }
+
+        .download-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 12px;
+            font-size: 12px;
+            background-color: rgba(0, 123, 255, 0.4);
+        }
+
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        /* Mobile responsive styles */
+        @media screen and (max-width: 820px) {
+            body {
+                padding: 5px;
+            }
+
+            .a4-canvas {
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .heading {
+                font-size: 24px;
+                margin: 15px 0;
+            }
+
+            .image-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .image-container {
+                width: 100%;
+                max-width: 283.5px;
+                height: auto;
+                aspect-ratio: 1;
+            }
+
+            .circular-mask {
+                width: 100%;
+                height: 100%;
+            }
+
+            .controls {
+                width: 90%;
+                bottom: 5px;
+            }
+
+            /* Make buttons bigger for touch */
+            button {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+
+            .controls button {
+                min-width: 24px;
+                height: 24px;
+            }
+
+            .pan-controls button {
+                min-width: 22px;
+                height: 22px;
+                font-size: 10px;
+            }
+
+            .download-button {
+                padding: 8px 16px;
+                font-size: 14px;
+                bottom: 15px;
+            }
+        }
+
+        /* Small mobile devices */
+        @media screen and (max-width: 400px) {
+            .image-grid {
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .heading {
+                font-size: 20px;
+                margin: 10px 0;
+            }
+
+            .controls {
+                gap: 2px;
+                padding: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="a4-canvas" id="a4Canvas">
+        <h1 class="heading">AIVista</h1>
+        <div class="image-grid">
+            <div class="image-container" id="container1">
+                <div class="circular-mask">
+                    <div class="image-holder">
+                        <img class="preview-image" src="/api/placeholder/400/400" alt="Preview 1">
+                    </div>
+                </div>
+                <div class="controls">
+                    <button onclick="zoomIn(1)">+</button>
+                    <button onclick="zoomOut(1)">-</button>
+                    <label class="file-input-container">
+                        <button>Replace</button>
+                        <input type="file" class="file-input" onchange="handleImageUpload(event, 1)" accept="image/*">
+                    </label>
+                    <div class="pan-controls">
+                        <button onclick="pan(1, 0, -10)">↑</button>
+                        <button onclick="pan(1, 0, 10)">↓</button>
+                        <button onclick="pan(1, -10, 0)">←</button>
+                        <button onclick="pan(1, 10, 0)">→</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="download-button" onclick="downloadImage()">Print</button>
+    </div>
+
+    <script>
+        // Previous JavaScript remains the same
+        const imageStates = {};
+        const containers = 6;
+
+        // Initialize containers
+        for (let i = 2; i <= containers; i++) {
+            const container = document.querySelector('#container1').cloneNode(true);
+            container.id = `container${i}`;
+            
+            // Update file input handler
+            const fileInput = container.querySelector('.file-input');
+            fileInput.onchange = (e) => handleImageUpload(e, i);
+            
+            // Update zoom controls
+            const zoomInButton = container.querySelector('.controls button:first-child');
+            const zoomOutButton = container.querySelector('.controls button:nth-child(2)');
+            zoomInButton.onclick = () => zoomIn(i);
+            zoomOutButton.onclick = () => zoomOut(i);
+            
+            // Update pan controls
+            const panButtons = container.querySelectorAll('.pan-controls button');
+            panButtons[0].onclick = () => pan(i, 0, -10);
+            panButtons[1].onclick = () => pan(i, 0, 10);
+            panButtons[2].onclick = () => pan(i, -10, 0);
+            panButtons[3].onclick = () => pan(i, 10, 0);
+            
+            document.querySelector('.image-grid').appendChild(container);
+        }
+
+        // Initialize image states
+        for (let i = 1; i <= containers; i++) {
+            imageStates[i] = {
+                scale: 1,
+                translateX: 0,
+                translateY: 0
+            };
+        }
+
+        function updateImagePosition(element, state) {
+            element.style.transform = `
+                translate(-50%, -50%)
+                translate(${state.translateX}px, ${state.translateY}px)
+                scale(${state.scale})
+            `;
+        }
+
+        function pan(containerId, deltaX, deltaY) {
+            const state = imageStates[containerId];
+            state.translateX += deltaX;
+            state.translateY += deltaY;
+            updateImagePosition(
+                document.querySelector(`#container${containerId} .preview-image`),
+                state
+            );
+        }
+
+        function zoomIn(containerId) {
+            const state = imageStates[containerId];
+            state.scale = Math.min(3, state.scale + 0.05);
+            updateImagePosition(
+                document.querySelector(`#container${containerId} .preview-image`),
+                state
+            );
+        }
+
+        function zoomOut(containerId) {
+            const state = imageStates[containerId];
+            state.scale = Math.max(0.1, state.scale - 0.05);
+            updateImagePosition(
+                document.querySelector(`#container${containerId} .preview-image`),
+                state
+            );
+        }
+
+        function handleImageUpload(event, containerId) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.querySelector(`#container${containerId} .preview-image`);
+                    img.src = e.target.result;
+                    
+                    // Reset transformations
+                    imageStates[containerId] = {
+                        scale: 1,
+                        translateX: 0,
+                        translateY: 0
+                    };
+                    updateImagePosition(img, imageStates[containerId]);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function downloadImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 793.7;
+            canvas.height = 1122.5;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const promises = [];
+            
+            for (let i = 1; i <= containers; i++) {
+                const container = document.querySelector(`#container${i}`);
+                const img = container.querySelector('.preview-image');
+                const state = imageStates[i];
+                
+                // Skip placeholder images
+                if (img.src.includes('placeholder')) {
+                    continue;
+                }
+                
+                promises.push(new Promise((resolve) => {
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = 283.5;
+                    tempCanvas.height = 283.5;
+                    
+                    tempCtx.beginPath();
+                    tempCtx.arc(141.75, 141.75, 141.75, 0, Math.PI * 2);
+                    tempCtx.clip();
+                    
+                    const row = Math.floor((i - 1) / 2);
+                    const col = (i - 1) % 2;
+                    const x = 40 + col * (283.5 + 40);
+                    const y = 40 + row * (283.5 + 40);
+                    
+                    tempCtx.drawImage(
+                        img,
+                        -state.translateX,
+                        -state.translateY,
+                        img.width * state.scale,
+                        img.height * state.scale
+                    );
+                    
+                    ctx.drawImage(tempCanvas, x, y);
+                    resolve();
+                }));
+            }
+
+            // If no images were added to promises, add at least one promise
+            if (promises.length === 0) {
+                alert('Please add at least one image before printing.');
+                return;
+            }
+            
+            Promise.all(promises).then(() => {
+                // Create a new window with the canvas image
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Print</title>');
+                printWindow.document.write('<style>');
+                printWindow.document.write(`
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+                    img {
+                        width: 210mm;
+                        height: 297mm;
+                    }
+                `);
+                printWindow.document.write('</style></head><body>');
+                
+                // Add the image to the new window
+                const img = new Image();
+                img.src = canvas.toDataURL('image/png');
+                printWindow.document.body.appendChild(img);
+                
+                // Wait for image to load before printing
+                img.onload = function() {
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                    };
+                };
+            });
+        }
+    </script>
+</body>
+</html>
